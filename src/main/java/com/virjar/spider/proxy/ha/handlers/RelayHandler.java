@@ -30,9 +30,9 @@ public final class RelayHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if (nextChannel.isActive()) {
-            if (msg instanceof ReferenceCounted) {
-                ((ReferenceCounted) msg).retain();
-            }
+//            if (msg instanceof ReferenceCounted) {
+//                ((ReferenceCounted) msg).retain();
+//            }
             nextChannel.writeAndFlush(msg);
         } else {
             ReferenceCountUtil.release(msg);
