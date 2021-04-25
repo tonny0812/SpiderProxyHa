@@ -57,6 +57,9 @@ public class UpstreamProducer {
                 log.warn("response not ip format:{}", myOutIp);
                 return;
             }
+            if (IPUtils.isPrivate(myOutIp)) {
+                return;
+            }
 
             String newProxyTestUrl =
                     "http://" + myOutIp + ":" + Configs.adminServerPort + "/" + Constants.ADMIN_API_PATH.RESOLVE_IP;
