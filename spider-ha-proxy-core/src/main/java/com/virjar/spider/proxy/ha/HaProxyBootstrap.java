@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.virjar.spider.proxy.ha.admin.PortalManager;
 import com.virjar.spider.proxy.ha.core.HaProxyMapping;
 import com.virjar.spider.proxy.ha.core.Source;
+import com.virjar.spider.proxy.ha.core.UpstreamProducer;
 import com.virjar.spider.proxy.ha.utils.ClasspathResourceUtil;
 import com.virjar.spider.proxy.ha.utils.IPUtils;
 import io.netty.util.concurrent.DefaultThreadFactory;
@@ -35,6 +36,8 @@ public class HaProxyBootstrap {
         scheduler.scheduleAtFixedRate(Configs::doRefreshResource, 0,
                 Configs.refreshUpstreamInterval
                 , TimeUnit.SECONDS);
+
+        UpstreamProducer.relocateOutIpResolver();
 
         if (Configs.adminServerPort > 0
                 && Configs.adminServerPort < 65535) {

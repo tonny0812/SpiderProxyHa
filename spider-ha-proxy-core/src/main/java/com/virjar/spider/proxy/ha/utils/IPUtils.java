@@ -24,6 +24,7 @@ public class IPUtils {
         return true;
     }
 
+
     public static String fetchIp(String type) throws SocketException {
         Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
         while (networkInterfaces.hasMoreElements()) {
