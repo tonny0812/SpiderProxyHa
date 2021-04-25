@@ -110,7 +110,7 @@ public class UpstreamProducer {
     }
 
     private void testConnectForUpstream(IpAndPort ipAndPort) {
-        log.info("begin test for :{}", ipAndPort);
+        log.info("begin test for :{} with url:{}", ipAndPort, Configs.proxyHttpTestURL);
 
 
         // 对于任意代理资源，发送代理请求，使他访问我们到代理接口，拿到真实ip，另外探测出真实的ip出口
@@ -185,12 +185,12 @@ public class UpstreamProducer {
             @Override
             public void accept(Response response, Throwable throwable) {
                 if (throwable != null) {
-                    log.warn("error", throwable);
+                    log.warn("doRelocateTest  error", throwable);
                     return;
                 }
                 String responseBody = response.getResponseBody(StandardCharsets.UTF_8).trim();
-                log.info("test response :{} for proxy:{}", responseBody, ipAndPort);
-                if (ipAndPort.getIpPort().equals(responseBody)) {
+                log.info("doRelocateTest  response :{} for proxy:{}", responseBody, ipAndPort);
+                if (ipAndPort.getIp().equals(responseBody)) {
                     Configs.proxyHttpTestURL = candidateProxyHttpTestURL;
                 }
             }
