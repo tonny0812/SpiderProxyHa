@@ -6,6 +6,9 @@ import io.netty.util.AttributeKey;
 public interface Constants {
     String CONFIG_FILE = "config.ini";
 
+    String ADMIN_SERVER_PORT = "admin_server_port";
+    String ADMIN_API_TOKEN = "admin_api_token";
+
     AttributeKey<Channel> NEXT_CHANNEL = AttributeKey.newInstance("next_channel");
 
     interface CONFIG_SECTION {
@@ -28,8 +31,9 @@ public interface Constants {
         String LISTEN_TYPE = "listen_type";
     }
 
-    interface LOG_TAGS {
-        String TESTER = "TESTER";
+    interface ADMIN_API_PATH {
+        String RESOLVE_IP = "resolveIp";
+        String RE_DIAL = "reDial";
     }
 
 }

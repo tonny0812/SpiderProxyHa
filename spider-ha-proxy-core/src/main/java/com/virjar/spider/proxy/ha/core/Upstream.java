@@ -12,6 +12,7 @@ import io.netty.util.ReferenceCountUtil;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import io.netty.util.internal.ConcurrentSet;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 
@@ -42,6 +43,13 @@ public class Upstream {
      * 连接缓存，和真的代理服务器保持的连接，他是提前创建的连接用于代理转发加速
      */
     private final LinkedList<Channel> channelCache = new LinkedList<>();
+
+    /**
+     * 该ip是被拉黑的，被标记了之后，ip销毁不重连
+     */
+    @Setter
+    @Getter
+    private boolean isBlack = false;
 
     /**
      * 当前正在使用的连接资源，用于监控上游代理服务器是否掉线
@@ -305,13 +313,12 @@ public class Upstream {
             for (UpstreamDestroyEvent upstreamDestroyEvent : this.destroyCallbacks) {
                 upstreamDestroyEvent.onDestroy(this);
             }
-            log.warn("doDestroy: ", new Throwable());
+            // log.warn("doDestroy: ", new Throwable());
             source.getLooper().postDelay(() -> {
                 NettyUtils.closeAll(usedChannels);
                 NettyUtils.closeAll(channelCache);
             }, 30000);
         }
-
     }
 
 

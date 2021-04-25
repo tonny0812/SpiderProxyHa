@@ -1,6 +1,7 @@
 package com.virjar.spider.proxy.ha;
 
 import com.google.common.collect.Lists;
+import com.virjar.spider.proxy.ha.admin.PortalManager;
 import com.virjar.spider.proxy.ha.core.HaProxyMapping;
 import com.virjar.spider.proxy.ha.core.Source;
 import com.virjar.spider.proxy.ha.utils.ClasspathResourceUtil;
@@ -34,6 +35,11 @@ public class HaProxyBootstrap {
         scheduler.scheduleAtFixedRate(Configs::doRefreshResource, 0,
                 Configs.refreshUpstreamInterval
                 , TimeUnit.SECONDS);
+
+        if (Configs.adminServerPort > 0
+                && Configs.adminServerPort < 65535) {
+            PortalManager.startService();
+        }
     }
 
     private static void loadSourceConfig() throws Exception {
@@ -78,6 +84,16 @@ public class HaProxyBootstrap {
             String listenType = StringUtils.trimToEmpty(config.get(sourceItem, Constants.CONFIG_GLOBAL.LISTEN_TYPE))
                     .toLowerCase();
             configListenIp(listenType);
+        }
+
+        if (config.hasOption(sourceItem, Constants.ADMIN_SERVER_PORT)) {
+            Configs.adminServerPort = Integer.parseInt(
+                    config.get(sourceItem, Constants.ADMIN_SERVER_PORT)
+            );
+        }
+
+        if (config.hasOption(sourceItem, Constants.ADMIN_API_TOKEN)) {
+            Configs.adminApiToken = config.get(sourceItem, Constants.ADMIN_API_TOKEN);
         }
     }
 

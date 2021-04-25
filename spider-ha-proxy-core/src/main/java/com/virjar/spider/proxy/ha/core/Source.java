@@ -101,7 +101,7 @@ public class Source {
 
 
         upstream.addDestroyListener(upstream1 -> {
-            if (availableIpAndPort.isEmpty()) {
+            if (availableIpAndPort.isEmpty() && !upstream1.isBlack()) {
                 // 有可能有误判，所以如果ip不可用了那么重新再探测下
                 // 但是如果代理资源足够，那么我们也放弃探测
                 upstreamProducer.reTestUpstream(upstream1);
@@ -130,6 +130,7 @@ public class Source {
             if (!Configs.openPortSet.add(Configs.listenIp + ":" + port)) {
                 throw new IllegalStateException("duplicate port config :" + port);
             }
+            Configs.sourceMap.put(port, this);
         }
 
     }
@@ -359,4 +360,14 @@ public class Source {
         return false;
     }
 
+    public void reDial(Integer port) {
+        HaProxyMapping haProxyMapping = mapping.get(port);
+        if (haProxyMapping == null) {
+            log.warn("can not find haProxyMapping for mapping :{}", port);
+            return;
+        }
+        Upstream upstream = haProxyMapping.getUpstream();
+        upstream.setBlack(true);
+        looper.post(() -> upstream.become(UpstreamStat.DESTROYED));
+    }
 }

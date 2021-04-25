@@ -25,7 +25,6 @@ import java.util.Map;
 public class PortalHttpRequestDispatcher extends SimpleChannelInboundHandler<FullHttpRequest> {
     private ContentType contentType;
     private HttpMethod method;
-    private String urlPath;
     private String query;
 
     @Override
@@ -48,7 +47,7 @@ public class PortalHttpRequestDispatcher extends SimpleChannelInboundHandler<Ful
             return;
         }
         method = request.getMethod();
-        urlPath = uri.getPath();
+        String urlPath = uri.getPath();
         query = uri.getQuery();
         parseContentType(channelHandlerContext, request);
         //application/x-www-form-urlencoded
@@ -65,6 +64,8 @@ public class PortalHttpRequestDispatcher extends SimpleChannelInboundHandler<Ful
         }
 
         JSONObject jsonObject = buildRequestJson(request);
+        HttpHeaders headers = request.headers();
+        PortalManager.handleRequest(urlPath,channelHandlerContext.channel(), jsonObject, headers);
     }
 
     private JSONObject buildRequestJson(FullHttpRequest request) {

@@ -1,10 +1,12 @@
 package com.virjar.spider.proxy.ha;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.virjar.spider.proxy.ha.core.Source;
 import io.netty.util.internal.ConcurrentSet;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Configs {
@@ -34,4 +36,5 @@ public class Configs {
 
     public static Set<String> openPortSet = Sets.newConcurrentHashSet();
 
+    public static Map<Integer, Source> sourceMap = Maps.newHashMap();
 }
