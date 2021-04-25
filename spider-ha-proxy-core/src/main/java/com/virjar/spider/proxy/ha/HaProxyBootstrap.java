@@ -5,7 +5,6 @@ import com.virjar.spider.proxy.ha.core.HaProxyMapping;
 import com.virjar.spider.proxy.ha.core.Source;
 import com.virjar.spider.proxy.ha.utils.ClasspathResourceUtil;
 import com.virjar.spider.proxy.ha.utils.IPUtils;
-import io.netty.util.ResourceLeakDetector;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.ini4j.ConfigParser;

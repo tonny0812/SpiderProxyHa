@@ -115,6 +115,8 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
                     pipeline.remove(HttpRequestDecoder.class);
                     pipeline.remove(HttpServerHandler.class);
 
+                    //TODO MITM
+
                     pipeline.addLast(new RelayHandler(upstreamChannel));
                     upstreamChannel.pipeline().addLast(new RelayHandler(channelFuture.channel()));
                 });
