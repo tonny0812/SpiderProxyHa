@@ -2,8 +2,10 @@ package com.virjar.spider.proxy.ha;
 
 import com.google.common.collect.Lists;
 import com.virjar.spider.proxy.ha.auth.AuthHelper;
+import com.virjar.spider.proxy.ha.admin.PortalManager;
 import com.virjar.spider.proxy.ha.core.HaProxyMapping;
 import com.virjar.spider.proxy.ha.core.Source;
+import com.virjar.spider.proxy.ha.core.UpstreamProducer;
 import com.virjar.spider.proxy.ha.utils.ClasspathResourceUtil;
 import com.virjar.spider.proxy.ha.utils.IPUtils;
 import io.netty.util.concurrent.DefaultThreadFactory;
@@ -31,9 +33,17 @@ public class HaProxyBootstrap {
         // ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.ADVANCED);
 
         // 定时任务拉取数据源，启动HA服务
-        ScheduledExecutorService scheduler = Executors
-                .newScheduledThreadPool(1, new DefaultThreadFactory("main-scheduler"));
-        scheduler.scheduleAtFixedRate(Configs::doRefreshResource, 0, Configs.refreshUpstreamInterval, TimeUnit.SECONDS);
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, new DefaultThreadFactory("main-scheduler"));
+        scheduler.scheduleAtFixedRate(Configs::doRefreshResource, 0,
+                Configs.refreshUpstreamInterval
+                , TimeUnit.SECONDS);
+
+        UpstreamProducer.relocateOutIpResolver();
+
+        if (Configs.adminServerPort > 0
+                && Configs.adminServerPort < 65535) {
+            PortalManager.startService();
+        }
     }
 
     private static void loadSourceConfig() throws Exception {
@@ -57,21 +67,22 @@ public class HaProxyBootstrap {
         Configs.sourceList = ret;
     }
 
-    private static void parseGlobal(ConfigParser config, String sourceItem)
-            throws ConfigParser.NoSectionException, ConfigParser.NoOptionException,
-            ConfigParser.InterpolationException {
+    private static void parseGlobal(ConfigParser config, String sourceItem) throws ConfigParser.NoSectionException, ConfigParser.NoOptionException, ConfigParser.InterpolationException {
         if (config.hasOption(sourceItem, Constants.CONFIG_GLOBAL.REFRESH_UPSTREAM_INTERVAL)) {
             // 刷新频率
-            Configs.refreshUpstreamInterval = Integer
-                    .parseInt(config.get(sourceItem, Constants.CONFIG_GLOBAL.REFRESH_UPSTREAM_INTERVAL));
+            Configs.refreshUpstreamInterval = Integer.parseInt(
+                    config.get(sourceItem, Constants.CONFIG_GLOBAL.REFRESH_UPSTREAM_INTERVAL)
+            );
         }
         if (config.hasOption(sourceItem, Constants.CONFIG_GLOBAL.CACHE_CONNECTION_SIZE)) {
-            Configs.cacheConnPerUpstream = Integer
-                    .parseInt(config.get(sourceItem, Constants.CONFIG_GLOBAL.CACHE_CONNECTION_SIZE));
+            Configs.cacheConnPerUpstream = Integer.parseInt(
+                    config.get(sourceItem, Constants.CONFIG_GLOBAL.CACHE_CONNECTION_SIZE)
+            );
         }
         if (config.hasOption(sourceItem, Constants.CONFIG_GLOBAL.CACHE_CONNECTION_ALIVE_SECONDS)) {
-            Configs.cacheConnAliveSeconds = Integer
-                    .parseInt(config.get(sourceItem, Constants.CONFIG_GLOBAL.CACHE_CONNECTION_ALIVE_SECONDS));
+            Configs.cacheConnAliveSeconds = Integer.parseInt(
+                    config.get(sourceItem, Constants.CONFIG_GLOBAL.CACHE_CONNECTION_ALIVE_SECONDS)
+            );
         }
         if (config.hasOption(sourceItem, Constants.CONFIG_GLOBAL.LISTEN_TYPE)) {
             String listenType = StringUtils.trimToEmpty(config.get(sourceItem, Constants.CONFIG_GLOBAL.LISTEN_TYPE))
@@ -81,6 +92,16 @@ public class HaProxyBootstrap {
         if (config.hasOption(sourceItem, Constants.CONFIG_GLOBAL.AUTH_MODE)) {
             Configs.authConfig = AuthHelper.parseAuthConfigs(config, sourceItem);
         }
+
+        if (config.hasOption(sourceItem, Constants.ADMIN_SERVER_PORT)) {
+            Configs.adminServerPort = Integer.parseInt(
+                    config.get(sourceItem, Constants.ADMIN_SERVER_PORT)
+            );
+        }
+
+        if (config.hasOption(sourceItem, Constants.ADMIN_API_TOKEN)) {
+            Configs.adminApiToken = config.get(sourceItem, Constants.ADMIN_API_TOKEN);
+        }
     }
 
     private static void configListenIp(String listenType) {
@@ -89,19 +110,19 @@ public class HaProxyBootstrap {
             return;
         }
         switch (listenType) {
-        //lo,private,public,all
-        case "lo":
-            Configs.listenIp = "127.0.0.1";
-            break;
-        case "all":
-            Configs.listenIp = "0.0.0.0";
-            break;
-        default:
-            try {
-                Configs.listenIp = IPUtils.fetchIp(listenType);
-            } catch (SocketException e) {
-                //ignore
-            }
+            //lo,private,public,all
+            case "lo":
+                Configs.listenIp = "127.0.0.1";
+                break;
+            case "all":
+                Configs.listenIp = "0.0.0.0";
+                break;
+            default:
+                try {
+                    Configs.listenIp = IPUtils.fetchIp(listenType);
+                } catch (SocketException e) {
+                    //ignore
+                }
         }
         if (StringUtils.isBlank(Configs.listenIp)) {
             Configs.listenIp = "0.0.0.0";

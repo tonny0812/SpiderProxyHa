@@ -170,8 +170,14 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
     }
 
     private void handleApiHttpRequest() {
+
+        //PortalManager.handleRequest(httpRequest, ctx.channel());
         // 暂时都返回502，后续再处理真实业务逻辑
         HttpNettyUtils.writeBadRequest(ctx.channel(), httpRequest);
+//        if (httpRequest instanceof ReferenceCounted) {
+//            ((ReferenceCounted) httpRequest).retain();
+//        }
+
     }
 
     private boolean isRequestToOriginServer() {

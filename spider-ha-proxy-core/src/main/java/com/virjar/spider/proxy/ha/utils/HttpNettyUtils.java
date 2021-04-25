@@ -1,12 +1,15 @@
 package com.virjar.spider.proxy.ha.utils;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.io.BaseEncoding;
 import com.virjar.spider.proxy.ha.core.Source;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.handler.codec.http.*;
+import io.netty.util.concurrent.FutureListener;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;
@@ -188,5 +191,26 @@ public class HttpNettyUtils {
                 original.getMethod(), original.getUri());
         request.headers().set(original.headers());
         return request;
+    }
+
+    public static void responseJsonSuccess(Channel channel, Object data) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("code", 0);
+        jsonObject.put("data", data);
+        responseJson(channel, jsonObject);
+    }
+
+    public static void responseJsonFailed(Channel channel, String errorMessage) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("code", -1);
+        jsonObject.put("msg", errorMessage);
+        responseJson(channel, jsonObject);
+    }
+
+    public static void responseJson(Channel channel, JSONObject jsonObject) {
+        byte[] bytes = jsonObject.toJSONString().getBytes(StandardCharsets.UTF_8);
+        ByteBuf content = Unpooled.copiedBuffer(bytes);
+        FullHttpResponse fullHttpResponse = createFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, "application/json; charset=utf-8", content, bytes.length);
+        channel.writeAndFlush(fullHttpResponse).addListener(ChannelFutureListener.CLOSE);
     }
 }

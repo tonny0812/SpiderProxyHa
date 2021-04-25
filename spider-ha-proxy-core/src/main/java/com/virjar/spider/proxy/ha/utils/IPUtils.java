@@ -24,6 +24,12 @@ public class IPUtils {
         return true;
     }
 
+    public static boolean isPrivate(String input) {
+        return input.startsWith("192.")
+                || input.startsWith("10.")
+                || input.startsWith("172.") || input.equals("127.0.0.1");
+    }
+
     public static String fetchIp(String type) throws SocketException {
         Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
         while (networkInterfaces.hasMoreElements()) {

@@ -1,17 +1,24 @@
 package com.virjar.spider.proxy.ha.admin;
 
+import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Maps;
+import com.virjar.spider.proxy.ha.Constants;
+import com.virjar.spider.proxy.ha.admin.processors.ReDialProcessor;
+import com.virjar.spider.proxy.ha.admin.processors.ResolveOutIpProcessor;
+import com.virjar.spider.proxy.ha.utils.HttpNettyUtils;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.http.HttpContentCompressor;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.codec.http.*;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultThreadFactory;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -20,16 +27,39 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class PortalManager {
     private static final AtomicBoolean started = new AtomicBoolean(false);
-    private static ServerBootstrap serverBootstrap;
 
     public static void startService() {
         if (started.compareAndSet(false, true)) {
             startServiceInternal();
+            registerHandler(Constants.ADMIN_API_PATH.RESOLVE_IP, new ResolveOutIpProcessor());
+            registerHandler(Constants.ADMIN_API_PATH.RE_DIAL, new ReDialProcessor());
         }
     }
 
+    public static void registerHandler(String path, AdminRequestProcessor adminRequestProcessor) {
+        path = path.trim();
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
+        processors.put(path, adminRequestProcessor);
+    }
+
+    public static Map<String, AdminRequestProcessor> processors = Maps.newConcurrentMap();
+
+
+    public static void handleRequest(String urlPath, Channel channel, JSONObject request, HttpHeaders httpHeaders) {
+        AdminRequestProcessor processor = processors.get(urlPath);
+        if (processor == null) {
+            String body = "Bad Request to URI: " + urlPath;
+            FullHttpResponse response = HttpNettyUtils.createFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST, body);
+            channel.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+            return;
+        }
+        processor.process(channel, request, httpHeaders);
+    }
+
     private static void startServiceInternal() {
-        serverBootstrap = new ServerBootstrap();
+        ServerBootstrap serverBootstrap = new ServerBootstrap();
         NioEventLoopGroup serverBossGroup = new NioEventLoopGroup(
                 0,
                 new DefaultThreadFactory("admin-boss-group" + DefaultThreadFactory.toPoolName(NioEventLoopGroup.class))
