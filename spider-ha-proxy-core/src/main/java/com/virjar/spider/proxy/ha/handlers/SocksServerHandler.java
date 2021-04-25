@@ -48,7 +48,6 @@ public class SocksServerHandler extends SimpleChannelInboundHandler<SocksRequest
         String password = socksRequest.password();
         AuthInfo authInfo = AuthInfo.builder().username(username).pwd(password).build();
         // 密码鉴权
-        // TODO 这里有一个问题，鉴权的时候还没有绑定后端代理，haProxyMapping为null
         if (AuthenticatorManager.getAuthenticator(haProxyMapping.getSource()).authenticate(authInfo)) {
             ctx.pipeline().addFirst(new SocksCmdRequestDecoder());
             ctx.writeAndFlush(new SocksAuthResponse(SocksAuthStatus.SUCCESS));
@@ -60,6 +59,7 @@ public class SocksServerHandler extends SimpleChannelInboundHandler<SocksRequest
 
     private void handleInit(ChannelHandlerContext ctx) {
         // 对于socks代理来说，ip鉴权和密码鉴权是两个步骤，所以需要提前判定,先鉴权IP，然后鉴权密码
+        haProxyMapping = HaProxyMapping.get(ctx.channel());
         String clientIp = ClientAuthUtils.getClientIp(ctx.channel(), null);
         AuthInfo authInfo = AuthInfo.builder().ip(clientIp).build();
         if (AuthenticatorManager.getAuthenticator(haProxyMapping.getSource()).authenticate(authInfo)) {
@@ -78,9 +78,9 @@ public class SocksServerHandler extends SimpleChannelInboundHandler<SocksRequest
             return;
         }
 
-        // 创建到 后端代理资源的链接
-        haProxyMapping = HaProxyMapping.get(ctx.channel());
 
+
+        // 创建到 后端代理资源的链接
         haProxyMapping.borrowConnect(value -> {
             if (value == null) {
                 log.warn("connect to proxy server failed:{} ", haProxyMapping.resourceKey());
