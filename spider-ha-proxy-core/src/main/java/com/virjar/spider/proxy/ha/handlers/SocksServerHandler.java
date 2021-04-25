@@ -1,8 +1,11 @@
 package com.virjar.spider.proxy.ha.handlers;
 
+import com.virjar.spider.proxy.ha.auth.AuthInfo;
+import com.virjar.spider.proxy.ha.auth.AuthenticatorManager;
 import com.virjar.spider.proxy.ha.core.HaProxyMapping;
 import com.virjar.spider.proxy.ha.handlers.upstream.Socks5UpstreamHandShaker;
 import com.virjar.spider.proxy.ha.handlers.upstream.UpstreamHandShaker;
+import com.virjar.spider.proxy.ha.utils.ClientAuthUtils;
 import com.virjar.spider.proxy.ha.utils.NettyUtils;
 import io.netty.channel.*;
 import io.netty.handler.codec.socks.*;
@@ -23,23 +26,49 @@ public class SocksServerHandler extends SimpleChannelInboundHandler<SocksRequest
     protected void channelRead0(ChannelHandlerContext ctx, SocksRequest socksRequest) throws Exception {
         this.ctx = ctx;
         switch (socksRequest.requestType()) {
-            case INIT:
-                // 第一版，先不做鉴权
-                ctx.pipeline().addFirst(new SocksCmdRequestDecoder());
-                ctx.writeAndFlush(new SocksInitResponse(SocksAuthScheme.NO_AUTH));
-                break;
-            case AUTH:
-                ctx.pipeline().addFirst(new SocksCmdRequestDecoder());
-                ctx.writeAndFlush(new SocksAuthResponse(SocksAuthStatus.SUCCESS));
-                break;
-            case CMD:
-                handleCmd(ctx, socksRequest);
-                break;
-            case UNKNOWN:
-                ctx.close();
-                break;
+        case INIT:
+            handleInit(ctx);
+            break;
+        case AUTH:
+            handleAuth(ctx, (SocksAuthRequest) socksRequest);
+            break;
+        case CMD:
+            handleCmd(ctx, socksRequest);
+            break;
+        case UNKNOWN:
+            ctx.close();
+            break;
+        default:
         }
 
+    }
+
+    private void handleAuth(ChannelHandlerContext ctx, SocksAuthRequest socksRequest) {
+        String username = socksRequest.username();
+        String password = socksRequest.password();
+        AuthInfo authInfo = AuthInfo.builder().username(username).pwd(password).build();
+        // 密码鉴权
+        // TODO 这里有一个问题，鉴权的时候还没有绑定后端代理，haProxyMapping为null
+        if (AuthenticatorManager.getAuthenticator(haProxyMapping.getSource()).authenticate(authInfo)) {
+            ctx.pipeline().addFirst(new SocksCmdRequestDecoder());
+            ctx.writeAndFlush(new SocksAuthResponse(SocksAuthStatus.SUCCESS));
+        } else {
+            ctx.pipeline().addFirst(new SocksAuthRequestDecoder());
+            ctx.writeAndFlush(new SocksAuthResponse(SocksAuthStatus.FAILURE));
+        }
+    }
+
+    private void handleInit(ChannelHandlerContext ctx) {
+        // 对于socks代理来说，ip鉴权和密码鉴权是两个步骤，所以需要提前判定,先鉴权IP，然后鉴权密码
+        String clientIp = ClientAuthUtils.getClientIp(ctx.channel(), null);
+        AuthInfo authInfo = AuthInfo.builder().ip(clientIp).build();
+        if (AuthenticatorManager.getAuthenticator(haProxyMapping.getSource()).authenticate(authInfo)) {
+            ctx.pipeline().addFirst(new SocksCmdRequestDecoder());
+            ctx.writeAndFlush(new SocksInitResponse(SocksAuthScheme.NO_AUTH));
+            return;
+        }
+        ctx.pipeline().addFirst(new SocksAuthRequestDecoder());
+        ctx.write(new SocksInitResponse(SocksAuthScheme.AUTH_PASSWORD));
     }
 
     private void handleCmd(ChannelHandlerContext ctx, SocksRequest socksRequest) {
@@ -59,8 +88,7 @@ public class SocksServerHandler extends SimpleChannelInboundHandler<SocksRequest
                 return;
             }
             upstreamChannel = value;
-            new Socks5UpstreamHandShaker(upstreamChannel,
-                    haProxyMapping.getSource(),
+            new Socks5UpstreamHandShaker(upstreamChannel, haProxyMapping.getSource(),
                     new UpstreamHandShaker.UpstreamHandSharkCallback() {
                         @Override
                         public void onHandSharkFailed(String message) {
@@ -71,18 +99,14 @@ public class SocksServerHandler extends SimpleChannelInboundHandler<SocksRequest
                         public void onHandSharkSuccess() {
                             writeConnectSuccess();
                         }
-                    },
-                    (SocksCmdRequest) socksRequest
-            ).doHandShark();
+                    }, (SocksCmdRequest) socksRequest).doHandShark();
         });
-
 
     }
 
     private void writeConnectFailed(String message) {
         log.info("connect upstream failed {}", message);
-        ctx.channel().writeAndFlush(
-                new SocksCmdResponse(SocksCmdStatus.FAILURE, req.addressType()));
+        ctx.channel().writeAndFlush(new SocksCmdResponse(SocksCmdStatus.FAILURE, req.addressType()));
         NettyUtils.closeChannelIfActive(ctx.channel());
     }
 
@@ -103,14 +127,11 @@ public class SocksServerHandler extends SimpleChannelInboundHandler<SocksRequest
                     pipeline.remove(SocksMessageEncoder.class);
                     pipeline.remove(SocksServerHandler.class);
 
-
                     pipeline.addLast(new RelayHandler(upstreamChannel));
-                    upstreamChannel.pipeline()
-                            .addLast(new RelayHandler(ctx.channel()));
+                    upstreamChannel.pipeline().addLast(new RelayHandler(ctx.channel()));
                 });
 
     }
-
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) {

@@ -1,6 +1,7 @@
 package com.virjar.spider.proxy.ha;
 
 import com.google.common.collect.Lists;
+import com.virjar.spider.proxy.ha.auth.AuthHelper;
 import com.virjar.spider.proxy.ha.core.HaProxyMapping;
 import com.virjar.spider.proxy.ha.core.Source;
 import com.virjar.spider.proxy.ha.utils.ClasspathResourceUtil;
@@ -30,10 +31,9 @@ public class HaProxyBootstrap {
         // ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.ADVANCED);
 
         // 定时任务拉取数据源，启动HA服务
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, new DefaultThreadFactory("main-scheduler"));
-        scheduler.scheduleAtFixedRate(Configs::doRefreshResource, 0,
-                Configs.refreshUpstreamInterval
-                , TimeUnit.SECONDS);
+        ScheduledExecutorService scheduler = Executors
+                .newScheduledThreadPool(1, new DefaultThreadFactory("main-scheduler"));
+        scheduler.scheduleAtFixedRate(Configs::doRefreshResource, 0, Configs.refreshUpstreamInterval, TimeUnit.SECONDS);
     }
 
     private static void loadSourceConfig() throws Exception {
@@ -57,30 +57,31 @@ public class HaProxyBootstrap {
         Configs.sourceList = ret;
     }
 
-    private static void parseGlobal(ConfigParser config, String sourceItem) throws ConfigParser.NoSectionException, ConfigParser.NoOptionException, ConfigParser.InterpolationException {
+    private static void parseGlobal(ConfigParser config, String sourceItem)
+            throws ConfigParser.NoSectionException, ConfigParser.NoOptionException,
+            ConfigParser.InterpolationException {
         if (config.hasOption(sourceItem, Constants.CONFIG_GLOBAL.REFRESH_UPSTREAM_INTERVAL)) {
             // 刷新频率
-            Configs.refreshUpstreamInterval = Integer.parseInt(
-                    config.get(sourceItem, Constants.CONFIG_GLOBAL.REFRESH_UPSTREAM_INTERVAL)
-            );
+            Configs.refreshUpstreamInterval = Integer
+                    .parseInt(config.get(sourceItem, Constants.CONFIG_GLOBAL.REFRESH_UPSTREAM_INTERVAL));
         }
         if (config.hasOption(sourceItem, Constants.CONFIG_GLOBAL.CACHE_CONNECTION_SIZE)) {
-            Configs.cacheConnPerUpstream = Integer.parseInt(
-                    config.get(sourceItem, Constants.CONFIG_GLOBAL.CACHE_CONNECTION_SIZE)
-            );
+            Configs.cacheConnPerUpstream = Integer
+                    .parseInt(config.get(sourceItem, Constants.CONFIG_GLOBAL.CACHE_CONNECTION_SIZE));
         }
         if (config.hasOption(sourceItem, Constants.CONFIG_GLOBAL.CACHE_CONNECTION_ALIVE_SECONDS)) {
-            Configs.cacheConnAliveSeconds = Integer.parseInt(
-                    config.get(sourceItem, Constants.CONFIG_GLOBAL.CACHE_CONNECTION_ALIVE_SECONDS)
-            );
+            Configs.cacheConnAliveSeconds = Integer
+                    .parseInt(config.get(sourceItem, Constants.CONFIG_GLOBAL.CACHE_CONNECTION_ALIVE_SECONDS));
         }
         if (config.hasOption(sourceItem, Constants.CONFIG_GLOBAL.LISTEN_TYPE)) {
             String listenType = StringUtils.trimToEmpty(config.get(sourceItem, Constants.CONFIG_GLOBAL.LISTEN_TYPE))
                     .toLowerCase();
             configListenIp(listenType);
         }
+        if (config.hasOption(sourceItem, Constants.CONFIG_GLOBAL.AUTH_MODE)) {
+            Configs.authConfig = AuthHelper.parseAuthConfigs(config, sourceItem);
+        }
     }
-
 
     private static void configListenIp(String listenType) {
         if (IPUtils.isIpV4(listenType)) {
@@ -88,19 +89,19 @@ public class HaProxyBootstrap {
             return;
         }
         switch (listenType) {
-            //lo,private,public,all
-            case "lo":
-                Configs.listenIp = "127.0.0.1";
-                break;
-            case "all":
-                Configs.listenIp = "0.0.0.0";
-                break;
-            default:
-                try {
-                    Configs.listenIp = IPUtils.fetchIp(listenType);
-                } catch (SocketException e) {
-                    //ignore
-                }
+        //lo,private,public,all
+        case "lo":
+            Configs.listenIp = "127.0.0.1";
+            break;
+        case "all":
+            Configs.listenIp = "0.0.0.0";
+            break;
+        default:
+            try {
+                Configs.listenIp = IPUtils.fetchIp(listenType);
+            } catch (SocketException e) {
+                //ignore
+            }
         }
         if (StringUtils.isBlank(Configs.listenIp)) {
             Configs.listenIp = "0.0.0.0";
@@ -108,15 +109,19 @@ public class HaProxyBootstrap {
 
     }
 
-    private static Source parseSource(ConfigParser config, String sourceItem) throws ConfigParser.NoSectionException, ConfigParser.NoOptionException, ConfigParser.InterpolationException {
+    private static Source parseSource(ConfigParser config, String sourceItem)
+            throws ConfigParser.NoSectionException, ConfigParser.NoOptionException,
+            ConfigParser.InterpolationException {
         Source source = new Source(config.get(sourceItem, Constants.CONFIG_SECTION.NAME),
                 config.get(sourceItem, Constants.CONFIG_SECTION.PROTOCOL),
                 config.get(sourceItem, Constants.CONFIG_SECTION.SOURCE_URL),
-                config.get(sourceItem, Constants.CONFIG_SECTION.MAPPING_SPACE)
-        );
+                config.get(sourceItem, Constants.CONFIG_SECTION.MAPPING_SPACE));
         if (config.hasOption(sourceItem, Constants.CONFIG_SECTION.UPSTREAM_AUTH_USER)) {
             source.setUpstreamAuthUser(config.get(sourceItem, Constants.CONFIG_SECTION.UPSTREAM_AUTH_USER));
             source.setUpstreamAuthPassword(config.get(sourceItem, Constants.CONFIG_SECTION.UPSTREAM_AUTH_PASSWORD));
+        }
+        if (config.hasOption(sourceItem, Constants.CONFIG_GLOBAL.AUTH_MODE)) {
+            source.setAuthConfig(AuthHelper.parseAuthConfigs(config, sourceItem));
         }
 
         return source;

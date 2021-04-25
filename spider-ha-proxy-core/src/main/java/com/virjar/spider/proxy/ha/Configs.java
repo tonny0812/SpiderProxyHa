@@ -1,8 +1,8 @@
 package com.virjar.spider.proxy.ha;
 
 import com.google.common.collect.Sets;
+import com.virjar.spider.proxy.ha.auth.AuthConfig;
 import com.virjar.spider.proxy.ha.core.Source;
-import io.netty.util.internal.ConcurrentSet;
 
 import java.util.List;
 import java.util.Set;
@@ -23,8 +23,7 @@ public class Configs {
 
     public static String listenIp = "0.0.0.0";
 
-    public static int adminServerPort = -1;
-    public static String adminApiToken = "";
+    public static AuthConfig authConfig;
 
     public static void doRefreshResource() {
         for (Source source : sourceList) {
@@ -33,5 +32,6 @@ public class Configs {
     }
 
     public static Set<String> openPortSet = Sets.newConcurrentHashSet();
+
 
 }

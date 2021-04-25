@@ -26,6 +26,11 @@ public interface Constants {
         String CACHE_CONNECTION_SIZE = "cache_connection_size";
         String CACHE_CONNECTION_ALIVE_SECONDS = "cache_connection_seconds";
         String LISTEN_TYPE = "listen_type";
+        String AUTH_MODE = "auth_mode";
+        String AUTH_USERNAME = "auth_username";
+        String AUTH_PWD = "auth_password";
+        String AUTH_WHITE_IPS = "auth_white_ips";
+        String AUTH_BLACK_IPS = "auth_black_ips";
     }
 
     interface LOG_TAGS {

@@ -4,6 +4,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.virjar.spider.proxy.ha.Configs;
+import com.virjar.spider.proxy.ha.auth.AuthConfig;
 import com.virjar.spider.proxy.ha.safethread.Looper;
 import com.virjar.spider.proxy.ha.safethread.ValueCallback;
 import io.netty.channel.Channel;
@@ -39,6 +40,9 @@ public class Source {
     @Setter
     @Getter
     private String upstreamAuthPassword;
+    @Setter
+    @Getter
+    private AuthConfig authConfig;
 
     private final TreeSet<Integer> needBindPort = new TreeSet<>();
     private int portMappingSize;
