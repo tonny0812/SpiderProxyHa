@@ -187,16 +187,10 @@ public class Upstream {
             }
         }
 
-        createUpStreamImpl().addListener((ChannelFutureListener) channelFuture -> {
-            if (channelFuture.isSuccess()) {
-                safeDo(() -> valueCallback.onReceiveValue(channelFuture.channel()));
-                return;
-            }
-            valueCallback.onReceiveValue(null);
-        });
+        createUpstreamNoCache(valueCallback);
     }
 
-    public void createUpstreamNoCache(ValueCallback<Channel> valueCallback) {
+    void createUpstreamNoCache(ValueCallback<Channel> valueCallback) {
         if (!source.getLooper().inLooper()) {
             source.getLooper().post(() -> createUpstreamNoCache(valueCallback));
             return;
