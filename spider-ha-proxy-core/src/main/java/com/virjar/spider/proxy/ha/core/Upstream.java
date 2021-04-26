@@ -171,6 +171,10 @@ public class Upstream {
     }
 
     private void borrowConnect0(ValueCallback<Channel> valueCallback) {
+        if (!isActive()) {
+            valueCallback.onReceiveValue(null);
+            return;
+        }
         source.getLooper().checkLooper();
         while (true) {
             Channel one = channelCache.poll();
