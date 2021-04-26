@@ -25,7 +25,7 @@ public class Configs {
 
     public static String listenIp = "0.0.0.0";
 
-    public static int adminServerPort = -1;
+    public static int adminServerPort = 9085;
     public static String adminApiToken = "";
 
     public static void doRefreshResource() {
