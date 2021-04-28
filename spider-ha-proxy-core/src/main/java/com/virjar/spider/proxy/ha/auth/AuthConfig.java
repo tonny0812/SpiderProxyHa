@@ -1,10 +1,12 @@
 package com.virjar.spider.proxy.ha.auth;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Date: 2021-04-25
@@ -18,10 +20,10 @@ public class AuthConfig {
     private AuthMode authMode = AuthMode.NONE;
     @Getter
     @Setter
-    private List<String> whiteIps = Lists.newArrayList();
+    private Set<String> whiteIps = Sets.newHashSet();
     @Getter
     @Setter
-    private List<String> blackIps = Lists.newArrayList();
+    private Set<String> blackIps = Sets.newHashSet();
     @Getter
     @Setter
     private String authUsername;

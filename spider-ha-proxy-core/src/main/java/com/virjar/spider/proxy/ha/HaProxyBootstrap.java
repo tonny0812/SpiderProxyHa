@@ -1,6 +1,7 @@
 package com.virjar.spider.proxy.ha;
 
 import com.google.common.collect.Lists;
+import com.virjar.spider.proxy.ha.auth.AuthConfig;
 import com.virjar.spider.proxy.ha.auth.AuthHelper;
 import com.virjar.spider.proxy.ha.admin.PortalManager;
 import com.virjar.spider.proxy.ha.core.HaProxyMapping;
@@ -143,6 +144,8 @@ public class HaProxyBootstrap {
         }
         if (config.hasOption(sourceItem, Constants.CONFIG_GLOBAL.AUTH_MODE)) {
             source.setAuthConfig(AuthHelper.parseAuthConfigs(config, sourceItem));
+        }else{
+            source.setAuthConfig(new AuthConfig());
         }
 
         return source;

@@ -39,6 +39,7 @@ public interface Constants {
     interface ADMIN_API_PATH {
         String RESOLVE_IP = "resolveIp";
         String RE_DIAL = "reDial";
+        String MANAGE_WHITE_IP = "whiteIps";
     }
 
 }

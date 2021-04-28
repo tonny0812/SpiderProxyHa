@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.virjar.spider.proxy.ha.Configs;
 import com.virjar.spider.proxy.ha.Constants;
+import com.virjar.spider.proxy.ha.admin.processors.WhiteIpsManageProcessor;
 import com.virjar.spider.proxy.ha.admin.processors.ReDialProcessor;
 import com.virjar.spider.proxy.ha.admin.processors.ResolveOutIpProcessor;
 import com.virjar.spider.proxy.ha.utils.HttpNettyUtils;
@@ -33,6 +34,7 @@ public class PortalManager {
             startServiceInternal();
             registerHandler(Constants.ADMIN_API_PATH.RESOLVE_IP, new ResolveOutIpProcessor());
             registerHandler(Constants.ADMIN_API_PATH.RE_DIAL, new ReDialProcessor());
+            registerHandler(Constants.ADMIN_API_PATH.MANAGE_WHITE_IP, new WhiteIpsManageProcessor());
         }
     }
 

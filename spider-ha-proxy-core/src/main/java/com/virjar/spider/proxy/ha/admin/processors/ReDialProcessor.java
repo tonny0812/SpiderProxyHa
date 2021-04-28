@@ -8,12 +8,12 @@ import com.virjar.spider.proxy.ha.utils.HttpNettyUtils;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaders;
 
-public class ReDialProcessor implements AdminRequestProcessor {
+public class ReDialProcessor extends BaseAuthProcessor {
     @Override
-    public void process(Channel channel, JSONObject request, HttpHeaders httpHeaders) {
+    public void process0(Channel channel, JSONObject request, HttpHeaders httpHeaders) {
         Integer mappingPort = request.getInteger("mappingPort");
         if (mappingPort == null) {
-            HttpNettyUtils.responseJsonFailed(channel, "need param:{mappingPort}");
+            HttpNettyUtils.responseNeedParam(channel,"mappingPort");
             return;
         }
         Source source = Configs.sourceMap.get(mappingPort);

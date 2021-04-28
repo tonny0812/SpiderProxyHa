@@ -213,4 +213,8 @@ public class HttpNettyUtils {
         FullHttpResponse fullHttpResponse = createFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, "application/json; charset=utf-8", content, bytes.length);
         channel.writeAndFlush(fullHttpResponse).addListener(ChannelFutureListener.CLOSE);
     }
+
+    public static void responseNeedParam(Channel channel,String paramName){
+        responseJsonFailed(channel, String.format("need param:{%s}", paramName));
+    }
 }

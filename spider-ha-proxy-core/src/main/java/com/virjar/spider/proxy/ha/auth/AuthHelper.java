@@ -1,6 +1,6 @@
 package com.virjar.spider.proxy.ha.auth;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.virjar.spider.proxy.ha.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -49,7 +49,7 @@ public class AuthHelper {
         }
         String blackIps = StringUtils.trimToEmpty(config.get(sourceItem, Constants.CONFIG_GLOBAL.AUTH_BLACK_IPS));
         if (StringUtils.isNotBlank(blackIps)) {
-            authConfig.setBlackIps(Lists.newArrayList(StringUtils.split(blackIps, ",")));
+            authConfig.setBlackIps(Sets.newHashSet(StringUtils.split(blackIps, ",")));
         }
     }
 
@@ -59,9 +59,9 @@ public class AuthHelper {
         if (!config.hasOption(sourceItem, Constants.CONFIG_GLOBAL.AUTH_WHITE_IPS)) {
             return;
         }
-        String blackIps = StringUtils.trimToEmpty(config.get(sourceItem, Constants.CONFIG_GLOBAL.AUTH_WHITE_IPS));
-        if (StringUtils.isNotBlank(blackIps)) {
-            authConfig.setWhiteIps(Lists.newArrayList(StringUtils.split(blackIps, ",")));
+        String whiteIps = StringUtils.trimToEmpty(config.get(sourceItem, Constants.CONFIG_GLOBAL.AUTH_WHITE_IPS));
+        if (StringUtils.isNotBlank(whiteIps)) {
+            authConfig.setWhiteIps(Sets.newHashSet(StringUtils.split(whiteIps, ",")));
         }
     }
 
