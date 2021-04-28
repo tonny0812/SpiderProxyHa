@@ -1,6 +1,7 @@
 package com.virjar.spider.proxy.ha;
 
 import com.google.common.collect.Lists;
+import com.virjar.spider.proxy.ha.auth.AuthHelper;
 import com.virjar.spider.proxy.ha.admin.PortalManager;
 import com.virjar.spider.proxy.ha.core.HaProxyMapping;
 import com.virjar.spider.proxy.ha.core.Source;
@@ -88,6 +89,9 @@ public class HaProxyBootstrap {
                     .toLowerCase();
             configListenIp(listenType);
         }
+        if (config.hasOption(sourceItem, Constants.CONFIG_GLOBAL.AUTH_MODE)) {
+            Configs.authConfig = AuthHelper.parseAuthConfigs(config, sourceItem);
+        }
 
         if (config.hasOption(sourceItem, Constants.ADMIN_SERVER_PORT)) {
             Configs.adminServerPort = Integer.parseInt(
@@ -99,7 +103,6 @@ public class HaProxyBootstrap {
             Configs.adminApiToken = config.get(sourceItem, Constants.ADMIN_API_TOKEN);
         }
     }
-
 
     private static void configListenIp(String listenType) {
         if (IPUtils.isIpV4(listenType)) {
@@ -127,15 +130,19 @@ public class HaProxyBootstrap {
 
     }
 
-    private static Source parseSource(ConfigParser config, String sourceItem) throws ConfigParser.NoSectionException, ConfigParser.NoOptionException, ConfigParser.InterpolationException {
+    private static Source parseSource(ConfigParser config, String sourceItem)
+            throws ConfigParser.NoSectionException, ConfigParser.NoOptionException,
+            ConfigParser.InterpolationException {
         Source source = new Source(config.get(sourceItem, Constants.CONFIG_SECTION.NAME),
                 config.get(sourceItem, Constants.CONFIG_SECTION.PROTOCOL),
                 config.get(sourceItem, Constants.CONFIG_SECTION.SOURCE_URL),
-                config.get(sourceItem, Constants.CONFIG_SECTION.MAPPING_SPACE)
-        );
+                config.get(sourceItem, Constants.CONFIG_SECTION.MAPPING_SPACE));
         if (config.hasOption(sourceItem, Constants.CONFIG_SECTION.UPSTREAM_AUTH_USER)) {
             source.setUpstreamAuthUser(config.get(sourceItem, Constants.CONFIG_SECTION.UPSTREAM_AUTH_USER));
             source.setUpstreamAuthPassword(config.get(sourceItem, Constants.CONFIG_SECTION.UPSTREAM_AUTH_PASSWORD));
+        }
+        if (config.hasOption(sourceItem, Constants.CONFIG_GLOBAL.AUTH_MODE)) {
+            source.setAuthConfig(AuthHelper.parseAuthConfigs(config, sourceItem));
         }
 
         return source;

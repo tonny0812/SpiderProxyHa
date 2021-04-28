@@ -2,8 +2,8 @@ package com.virjar.spider.proxy.ha;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.virjar.spider.proxy.ha.auth.AuthConfig;
 import com.virjar.spider.proxy.ha.core.Source;
-import io.netty.util.internal.ConcurrentSet;
 
 import java.util.List;
 import java.util.Map;
@@ -24,6 +24,8 @@ public class Configs {
     public static int cacheConnAliveSeconds = 30;
 
     public static String listenIp = "0.0.0.0";
+
+    public static AuthConfig authConfig;
 
     public static int adminServerPort = 9085;
     public static String adminApiToken = "";
