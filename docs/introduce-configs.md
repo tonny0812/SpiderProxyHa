@@ -25,6 +25,16 @@ source配置项中的upstream_auth_user/upstream_auth_password是用于配置上
 auth_mode = NONE
 ```
 
+### ALL模式
+```
+auth_mode = ALL
+# IP列表由,分割
+auth_white_ips = 127.0.0.3,127.0.0.4
+auth_username = test
+auth_password = hello_world
+auth_black_ips = 127.0.0.10
+```
+
 ### IP白名单模式
 白名单模式下只鉴权客户端IP。
 
@@ -72,7 +82,7 @@ curl -v "http://xxxx/testproxy" --socks5 username:password@122.96.59.105:23068
 ```
 auth_mode = BLACK_IP
 # IP列表由,分割
-auth_white_ips = 127.0.0.3,127.0.0.4
+auth_black_ips = 127.0.0.3,127.0.0.4
 auth_username = test
 auth_password = hello_world
 ```

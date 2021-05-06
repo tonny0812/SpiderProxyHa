@@ -32,6 +32,11 @@ public class AuthHelper {
             case WHITE_IP_ONLY:
                 parseWhiteIps(authConfig, config, sourceItem);
                 break;
+            case ALL:
+                parseBlackIps(authConfig, config, sourceItem);
+                parseWhiteIps(authConfig, config, sourceItem);
+                parseAuthToken(authConfig, config, sourceItem);
+                break;
             default:
             }
             return authConfig;

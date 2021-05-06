@@ -134,7 +134,7 @@ public class HaProxyBootstrap {
     private static Source parseSource(ConfigParser config, String sourceItem)
             throws ConfigParser.NoSectionException, ConfigParser.NoOptionException,
             ConfigParser.InterpolationException {
-        Source source = new Source(config.get(sourceItem, Constants.CONFIG_SECTION.NAME),
+        Source source = new Source(sourceItem,config.get(sourceItem, Constants.CONFIG_SECTION.NAME),
                 config.get(sourceItem, Constants.CONFIG_SECTION.PROTOCOL),
                 config.get(sourceItem, Constants.CONFIG_SECTION.SOURCE_URL),
                 config.get(sourceItem, Constants.CONFIG_SECTION.MAPPING_SPACE));

@@ -25,6 +25,9 @@ import java.util.*;
 public class Source {
     @NonNull
     @Getter
+    private final String id;
+    @NonNull
+    @Getter
     private final String name;
     @NonNull
     @Getter

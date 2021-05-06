@@ -5,6 +5,7 @@ import io.netty.util.AttributeKey;
 
 public interface Constants {
     String CONFIG_FILE = "config.ini";
+    String UPDATED_CONFIG_FILE = "updated_config.ini";
 
     String ADMIN_SERVER_PORT = "admin_server_port";
     String ADMIN_API_TOKEN = "admin_api_token";
