@@ -11,8 +11,9 @@ source配置项中的upstream_auth_user/upstream_auth_password是用于配置上
 3. source未配置鉴权时，会尝试查找global鉴权配置，若global也未配置，则不进行鉴权
 
 ### 客户端鉴权模式，
-可选以下四种,也可以为每个source单独配置，默认为不鉴权
+可选以下五种,也可以为每个source单独配置，默认为不鉴权
 - NONE 不鉴权
+- ALL 以下所有模式的配置同时生效，生效条件为：用户密码通过并且不在黑名单 或者 在白名单IP配置中
 - USER_ONLY 用户+密码模式，需要配置auth_username和auth_password，客户端使用时与正常代理配置用户密码一致
 - WHITE_IP_ONLY IP白名单模式，需要配置auth_white_ips
 - BLACK_IP IP黑名单模式，需要配置auth_black_ips，可以同时配置auth_username和auth_password进行用户鉴权

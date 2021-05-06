@@ -50,6 +50,10 @@ public class AuthConfig {
         /**
          * IP黑名单，可以与USER模式一起使用
          */
-        BLACK_IP
+        BLACK_IP,
+        /**
+         * 所有模式的配置均可生效
+         */
+        ALL
     }
 }
