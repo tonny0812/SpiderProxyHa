@@ -45,6 +45,7 @@ public class Source {
     private AuthConfig authConfig;
 
     private final TreeSet<Integer> needBindPort = new TreeSet<>();
+    private final HashSet<String> whiteTarget = new HashSet<>();
     private int portMappingSize;
 
     private final LinkedList<Upstream> availableUpstream = new LinkedList<>();

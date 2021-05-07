@@ -45,7 +45,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, HttpRequest httpRequest) throws Exception {
         this.ctx = ctx;
-        log.info("Received raw request: {}", httpRequest);
+        log.info("Received raw request from ip:{} : request:{} ", ctx.channel().remoteAddress(), httpRequest);
         if (httpRequest.getDecoderResult().isFailure()) {
             log.warn("Could not parse request from client. Decoder result: {}",
                     httpRequest.getDecoderResult().toString());
