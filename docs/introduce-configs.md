@@ -67,10 +67,10 @@ auth_password = hello_world
 测试代理可用性：
 ```
 #带上用户名密码
-curl -v "http://xxxx/testproxy" -x username:password@122.96.59.105:23068
+curl -v "http://127.0.0.1:9085/resolveIp" -x test:hello_world@127.0.0.1:36000
 
 #socks5
-curl -v "http://xxxx/testproxy" --socks5 username:password@122.96.59.105:23068
+curl -v "http://127.0.0.1:9085/resolveIp" --socks5 test:hello_world@127.0.0.1:36000
 ```
 
 ### IP黑名单模式
