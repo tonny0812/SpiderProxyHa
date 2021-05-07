@@ -84,7 +84,7 @@ public class BasicAuthenticator extends BaseRefreshGlobalAuthenticator {
     }
 
     private static boolean isIpInRange(String ip, String cidr) {
-        if (!ip.contains("/")) {
+        if (!cidr.contains("/")) {
             return StringUtils.equals(ip, cidr);
         }
         // cidr写法

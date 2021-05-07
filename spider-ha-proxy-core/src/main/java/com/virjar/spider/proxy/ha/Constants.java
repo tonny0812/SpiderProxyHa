@@ -21,6 +21,7 @@ public interface Constants {
         String SOURCE_URL = "source_url";
         String UPSTREAM_AUTH_USER = "upstream_auth_user";
         String UPSTREAM_AUTH_PASSWORD = "upstream_auth_password";
+        String WHITE_TARGET = "white_target";
 
     }
 
