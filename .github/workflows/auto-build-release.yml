@@ -1,0 +1,30 @@
+name: auto-build-spider-proxy-ha-release
+on:
+  # 只针对以v开头的tag发布自动打包，例如v1.0
+  tags:
+    - 'v*'
+jobs:
+  build-and-public-release:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      # 第一步：下载源码
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      # 第二步：打包构建
+      - name: setup jdk
+        uses: actions/setup-java@v2
+          with:
+          java-version: '11'
+          distribution: 'adopt'
+      - name: Build spider-proxy-ha-core with Maven
+        run: |
+          cd spider-ha-proxy-core
+          mvn -B clean -P prod -Dmaven.test.skip=true package appassembler:assemble
+      - name: zip spider-proxy-ha-core
+        run: |
+          mv spider-ha-proxy-core-1.0.jar dist-spider-proxy-ha
+      - run: echo "🍏 This job's status is ${{ job.status }}."
