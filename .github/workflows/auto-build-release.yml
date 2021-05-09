@@ -72,6 +72,9 @@ jobs:
           fliename: "upstream-mocker-${{ steps.versions-mocker.outputs.value }}.zip"
           path: upstream-mocker/target/dist-mocker
       - run: echo "🍏 zip spider-proxy-core success upstream-mocker-${{ steps.versions-mocker.outputs.value }}.zip"
+      - run: ls -l  upstream-mocker/target/dist-mocker
+      - run: ls -l
+      # 创建release
       - name: create release
         id: create_release
         uses: actions/create-release@v1
@@ -83,7 +86,7 @@ jobs:
           draft: false
           prerelease: false
       - run: echo "🍏 create release success ${{ steps.versions-tag.outputs.value }}"
-      # 上传release
+      # 上传assets
       - name: upload mocker release asstes
         uses: actions/upload-release-asset@v1
         env:
