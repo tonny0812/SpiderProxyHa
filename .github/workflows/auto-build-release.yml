@@ -17,9 +17,9 @@ jobs:
       # 第二步：打包构建
       - name: setup jdk
         uses: actions/setup-java@v2
-          with:
-            java-version: '11'
-            distribution: 'adopt'
+        with:
+          java-version: '11'
+          distribution: 'adopt'
       # 读取core版本
       - name: read version of proxy-core
         id: versions-core
@@ -54,10 +54,10 @@ jobs:
       - name: zip spider-proxy-ha-core
         run: mv target/spider-ha-proxy-core-${{ steps.versions-core.outputs.value }}.jar target/dist-spider-proxy-ha
         uses: thedoctor0/zip-release@master
-          with:
-            fliename: "spider-proxy-ha-${{ steps.versions-core.outputs.value }}.zip"
-            path: target/dist-spider-proxy-ha
-      - run: echo "🍏 zip spider-proxy-core success: spider-proxy-ha-${{ steps.versions-core.outputs.value }}.zip"
+        with:
+          fliename: "spider-proxy-ha-${{ steps.versions-core.outputs.value }}.zip"
+          path: target/dist-spider-proxy-ha
+      - run: echo "🍏 zip spider-proxy-core success spider-proxy-ha-${{ steps.versions-core.outputs.value }}.zip"
       # 构建upstream-mocker
       - name: Build upstream-mocker with Maven
         run: |
@@ -68,10 +68,10 @@ jobs:
       - name: zip upstream-mocker
         run: mv target/upstream-mocker-${{ steps.versions-mocker.outputs.value }}.jar target/dist-mocker
         uses: thedoctor0/zip-release@master
-          with:
-            fliename: "upstream-mocker-${{ steps.versions-mocker.outputs.value }}.zip"
-            path: target/dist-mocker
-      - run: echo "🍏 zip spider-proxy-core success: upstream-mocker-${{ steps.versions-mocker.outputs.value }}.jar.zip"
+        with:
+          fliename: "upstream-mocker-${{ steps.versions-mocker.outputs.value }}.zip"
+          path: target/dist-mocker
+      - run: echo "🍏 zip spider-proxy-core success upstream-mocker-${{ steps.versions-mocker.outputs.value }}.jar.zip"
       - name: create release
         id: create_release
         uses: actions/create-release@v1
@@ -82,7 +82,7 @@ jobs:
           release_name: Release ${{ steps.versions-tag.outputs.value }}
           draft: false
           prerelease: false
-      - run: echo "🍏 create release success: ${{ steps.versions-tag.outputs.value }}"
+      - run: echo "🍏 create release success ${{ steps.versions-tag.outputs.value }}"
       # 上传release
       - name: upload mocker release asstes
       - uses: actions/upload-release-asset@v1
