@@ -93,7 +93,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./upstream-mocker-${{ steps.versions-mocker.outputs.value }}.zip
+          asset_path: ./upstream-mocker/target/dist-mocker/upstream-mocker-${{ steps.versions-mocker.outputs.value }}.zip
           asset_name: upstream-mocker-${{ steps.versions-mocker.outputs.value }}.zip
           asset_content_type: application/zip
       - name: upload core release asstes
@@ -102,7 +102,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./spider-ha-proxy-core-${{ steps.versions-core.outputs.value }}.zip
+          asset_path: ./spider-ha-proxy-core/target/dist-spider-proxy-ha/spider-ha-proxy-core-${{ steps.versions-core.outputs.value }}.zip
           asset_name: spider-ha-proxy-core-${{ steps.versions-core.outputs.value }}.zip
           asset_content_type: application/zip
       - run: echo "🍏 This job's status is ${{ job.status }}."
