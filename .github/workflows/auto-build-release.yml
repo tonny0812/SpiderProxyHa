@@ -45,35 +45,33 @@ jobs:
           property: tag-version
       - run: echo "🍏 read version of tag ${{ steps.versions-tag.outputs.value }}."
       # 构建spider-proxy-ha-core
-      - run: cd spider-ha-proxy-core
-      - run: ls -l ./
       - name: Build spider-proxy-ha-core with Maven
-        run: mvn -B clean -P prod -Dmaven.test.skip=true package appassembler:assemble
+        run: |
+          cd spider-ha-proxy-core
+          mvn -B clean -P prod -Dmaven.test.skip=true package appassembler:assemble
       - run: echo "🍏 maven build spider-proxy-core success."
       # 打包spider-proxy-ha-core
-      - run: ls -l ./
-      - run: mv target/spider-ha-proxy-core-${{ steps.versions-core.outputs.value }}.jar target/dist-spider-proxy-ha
+      - run: mv spider-ha-proxy-core/target/spider-ha-proxy-core-${{ steps.versions-core.outputs.value }}.jar spider-ha-proxy-core/target/dist-spider-proxy-ha
       - name: zip spider-proxy-ha-core
         uses: thedoctor0/zip-release@master
         with:
           fliename: "spider-proxy-ha-${{ steps.versions-core.outputs.value }}.zip"
-          path: target/dist-spider-proxy-ha
+          path: spider-ha-proxy-core/target/dist-spider-proxy-ha
       - run: echo "🍏 zip spider-proxy-core success spider-proxy-ha-${{ steps.versions-core.outputs.value }}.zip"
       # 构建upstream-mocker
-      - run: cd ../upstream-mocker
-      - run: ls -l ./
       - name: Build upstream-mocker with Maven
-        run: mvn -B clean -Dmaven.test.skip=true package appassembler:assemble
+        run: |
+          cd upstream-mocker
+          mvn -B clean -Dmaven.test.skip=true package appassembler:assemble
       - run: echo "🍏 maven build upstream-mocker success."
-      - run: ls -l ./
       # 打包upstream-mocker
-      - run: mv target/upstream-mocker-${{ steps.versions-mocker.outputs.value }}.jar target/dist-mocker
+      - run: mv upstream-mocker/target/upstream-mocker-${{ steps.versions-mocker.outputs.value }}.jar upstream-mocker/target/dist-mocker
       - name: zip upstream-mocker
         uses: thedoctor0/zip-release@master
         with:
           fliename: "upstream-mocker-${{ steps.versions-mocker.outputs.value }}.zip"
-          path: target/dist-mocker
-      - run: echo "🍏 zip spider-proxy-core success upstream-mocker-${{ steps.versions-mocker.outputs.value }}.jar.zip"
+          path: upstream-mocker/target/dist-mocker
+      - run: echo "🍏 zip spider-proxy-core success upstream-mocker-${{ steps.versions-mocker.outputs.value }}.zip"
       - name: create release
         id: create_release
         uses: actions/create-release@v1
