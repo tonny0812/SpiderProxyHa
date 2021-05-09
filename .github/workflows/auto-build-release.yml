@@ -35,7 +35,7 @@ jobs:
         with:
           path: ./release.json
           property: upstream-mocker-version
-      - run: echo "🍏 read version of proxy-core ${{ steps.versions-mocker.outputs.value }}."
+      - run: echo "🍏 read version of upstream-mocker ${{ steps.versions-mocker.outputs.value }}."
       # 读取tag号
       - name: read version of tag
         id: versions-tag
@@ -43,7 +43,7 @@ jobs:
         with:
           path: ./release.json
           property: tag-version
-      - run: echo "🍏 read version of proxy-core ${{ steps.versions-tag.outputs.value }}."
+      - run: echo "🍏 read version of tag ${{ steps.versions-tag.outputs.value }}."
       # 构建spider-proxy-ha-core
       - name: Build spider-proxy-ha-core with Maven
         run: |
