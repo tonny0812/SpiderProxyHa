@@ -53,7 +53,7 @@ jobs:
       # 打包spider-proxy-ha-core
       - name: zip spider-proxy-ha-core
         run: mv target/spider-ha-proxy-core-${{ steps.versions-core.outputs.value }}.jar target/dist-spider-proxy-ha
-        uses: thedoctor0/zip-release@master
+      - uses: thedoctor0/zip-release@master
         with:
           fliename: "spider-proxy-ha-${{ steps.versions-core.outputs.value }}.zip"
           path: target/dist-spider-proxy-ha
@@ -67,7 +67,7 @@ jobs:
       # 打包upstream-mocker
       - name: zip upstream-mocker
         run: mv target/upstream-mocker-${{ steps.versions-mocker.outputs.value }}.jar target/dist-mocker
-        uses: thedoctor0/zip-release@master
+      - uses: thedoctor0/zip-release@master
         with:
           fliename: "upstream-mocker-${{ steps.versions-mocker.outputs.value }}.zip"
           path: target/dist-mocker
