@@ -85,7 +85,7 @@ jobs:
       - run: echo "🍏 create release success ${{ steps.versions-tag.outputs.value }}"
       # 上传release
       - name: upload mocker release asstes
-      - uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -94,7 +94,7 @@ jobs:
           asset_name: upstream-mocker-${{ steps.versions-mocker.outputs.value }}.zip
           asset_content_type: application/zip
       - name: upload core release asstes
-      - uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
