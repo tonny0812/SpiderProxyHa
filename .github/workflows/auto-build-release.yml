@@ -56,7 +56,7 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           filename: "spider-ha-proxy-core-${{ steps.versions-core.outputs.value }}.zip"
-          path: spider-ha-proxy-core/target/dist-spider-proxy-ha
+          directory: spider-ha-proxy-core/target/dist-spider-proxy-ha
       - run: echo "🍏 zip spider-proxy-core success spider-proxy-ha-${{ steps.versions-core.outputs.value }}.zip"
       # 构建upstream-mocker
       - name: Build upstream-mocker with Maven
@@ -70,7 +70,7 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           filename: "upstream-mocker-${{ steps.versions-mocker.outputs.value }}.zip"
-          path: upstream-mocker/target/dist-mocker
+          directory: upstream-mocker/target/dist-mocker
       - run: echo "🍏 zip spider-proxy-core success upstream-mocker-${{ steps.versions-mocker.outputs.value }}.zip"
       - run: ls -l  upstream-mocker/target/dist-mocker
       - run: ls -l
