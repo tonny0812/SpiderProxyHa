@@ -52,6 +52,7 @@ jobs:
       - run: echo "🍏 maven build spider-proxy-core success."
       # 打包spider-proxy-ha-core
       - run: mv target/spider-ha-proxy-core-${{ steps.versions-core.outputs.value }}.jar target/dist-spider-proxy-ha
+      - run: ls -l ./
       - name: zip spider-proxy-ha-core
         uses: thedoctor0/zip-release@master
         with:
