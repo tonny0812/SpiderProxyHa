@@ -55,7 +55,7 @@ jobs:
       - name: zip spider-proxy-ha-core
         uses: thedoctor0/zip-release@master
         with:
-          filename: "spider-proxy-ha-${{ steps.versions-core.outputs.value }}.zip"
+          filename: "spider-ha-proxy-core-${{ steps.versions-core.outputs.value }}.zip"
           path: spider-ha-proxy-core/target/dist-spider-proxy-ha
       - run: echo "🍏 zip spider-proxy-core success spider-proxy-ha-${{ steps.versions-core.outputs.value }}.zip"
       # 构建upstream-mocker
