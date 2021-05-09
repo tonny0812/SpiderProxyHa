@@ -96,7 +96,7 @@
                     <!-- prefix all bin files with "mycompany" -->
                     <!--<binPrefix>startup</binPrefix>-->
                     <!-- set alternative assemble directory -->
-                    <assembleDirectory>${project.build.directory}/dist-spider-proxy-ha-${project.version}
+                    <assembleDirectory>${project.build.directory}/dist-spider-proxy-ha
                     </assembleDirectory>
                     <!-- Extra JVM arguments that will be included in the bin scripts -->
                     <!-- -Xdebug -Xrunjdwp:transport=dt_socket,suspend=n,server=y,address=0.0.0.0:5555 -->

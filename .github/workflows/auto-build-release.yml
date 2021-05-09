@@ -1,8 +1,8 @@
 name: auto-build-spider-proxy-ha-release
 on:
-  # 只针对以v开头的tag发布自动打包，例如v1.0
-  tags:
-    - 'v*'
+  push:
+    paths:
+      - 'release.json'
 jobs:
   build-and-public-release:
     runs-on: ubuntu-latest
@@ -18,13 +18,88 @@ jobs:
       - name: setup jdk
         uses: actions/setup-java@v2
           with:
-          java-version: '11'
-          distribution: 'adopt'
+            java-version: '11'
+            distribution: 'adopt'
+      # 读取core版本
+      - name: read version of proxy-core
+        id: versions-core
+        uses: ashley-taylor/read-json-property-action@v1.0
+        with:
+          path: ./release.json
+          property: proxy-core-version
+      - run: echo "🍏 read version of proxy-core ${{ steps.versions-core.outputs.value }}."
+      # 读取mocker版本
+      - name: read version of upstream-mocker
+        id: versions-mocker
+        uses: ashley-taylor/read-json-property-action@v1.0
+        with:
+          path: ./release.json
+          property: upstream-mocker-version
+      - run: echo "🍏 read version of proxy-core ${{ steps.versions-mocker.outputs.value }}."
+      # 读取tag号
+      - name: read version of tag
+        id: versions-tag
+        uses: ashley-taylor/read-json-property-action@v1.0
+        with:
+          path: ./release.json
+          property: tag-version
+      - run: echo "🍏 read version of proxy-core ${{ steps.versions-tag.outputs.value }}."
+      # 构建spider-proxy-ha-core
       - name: Build spider-proxy-ha-core with Maven
         run: |
           cd spider-ha-proxy-core
           mvn -B clean -P prod -Dmaven.test.skip=true package appassembler:assemble
+      - run: echo "🍏 maven build spider-proxy-core success."
+      # 打包spider-proxy-ha-core
       - name: zip spider-proxy-ha-core
+        run: mv target/spider-ha-proxy-core-${{ steps.versions-core.outputs.value }}.jar target/dist-spider-proxy-ha
+        uses: thedoctor0/zip-release@master
+          with:
+            fliename: "spider-proxy-ha-${{ steps.versions-core.outputs.value }}.zip"
+            path: target/dist-spider-proxy-ha
+      - run: echo "🍏 zip spider-proxy-core success: spider-proxy-ha-${{ steps.versions-core.outputs.value }}.zip"
+      # 构建upstream-mocker
+      - name: Build upstream-mocker with Maven
         run: |
-          mv spider-ha-proxy-core-1.0.jar dist-spider-proxy-ha
+          cd ../upstream-mocker
+          mvn -B clean -Dmaven.test.skip=true package appassembler:assemble
+      - run: echo "🍏 maven build upstream-mocker success."
+      # 打包upstream-mocker
+      - name: zip upstream-mocker
+        run: mv target/upstream-mocker-${{ steps.versions-mocker.outputs.value }}.jar target/dist-mocker
+        uses: thedoctor0/zip-release@master
+          with:
+            fliename: "upstream-mocker-${{ steps.versions-mocker.outputs.value }}.zip"
+            path: target/dist-mocker
+      - run: echo "🍏 zip spider-proxy-core success: upstream-mocker-${{ steps.versions-mocker.outputs.value }}.jar.zip"
+      - name: create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.versions-tag.outputs.value }}
+          release_name: Release ${{ steps.versions-tag.outputs.value }}
+          draft: false
+          prerelease: false
+      - run: echo "🍏 create release success: ${{ steps.versions-tag.outputs.value }}"
+      # 上传release
+      - name: upload mocker release asstes
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./upstream-mocker-${{ steps.versions-mocker.outputs.value }}.zip
+          asset_name: upstream-mocker-${{ steps.versions-mocker.outputs.value }}.zip
+          asset_content_type: application/zip
+      - name: upload core release asstes
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./spider-ha-proxy-core-${{ steps.versions-core.outputs.value }}.zip
+          asset_name: spider-ha-proxy-core-${{ steps.versions-core.outputs.value }}.zip
+          asset_content_type: application/zip
       - run: echo "🍏 This job's status is ${{ job.status }}."
