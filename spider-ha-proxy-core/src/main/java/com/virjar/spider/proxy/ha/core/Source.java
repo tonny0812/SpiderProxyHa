@@ -101,6 +101,10 @@ public class Source {
         if (availableUpstream.size() > portMappingSize * 2) {
             // 两级缓存，太多的可用ip了，所以这里放到内存，不进行连接创建
             availableIpAndPort.addFirst(ipAndPort);
+            int maxCacheSize = portMappingSize * 10;
+            while (availableIpAndPort.size() > maxCacheSize) {
+                availableIpAndPort.removeLast();
+            }
             return;
         }
 
