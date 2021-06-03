@@ -268,7 +268,7 @@ public class Upstream {
                 channelCache.addFirst(upstreamChannel);
                 upstreamChannel.eventLoop().schedule(() -> {
                             // 超时一直没有使用，那么把他销毁
-                            if (upstreamChannel.isActive()) {
+                            if (upstreamChannel.attr(IS_IDLE_CONNECTION).get() && upstreamChannel.isActive()) {
                                 upstreamChannel.attr(IS_IDLE_NORMAL_CLOSE).set(true);
                                 upstreamChannel.close();
                                 log.info("destroy unused channel");
