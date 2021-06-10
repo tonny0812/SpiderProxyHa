@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.asynchttpclient.*;
 import org.asynchttpclient.proxy.ProxyServer;
+import org.asynchttpclient.proxy.ProxyType;
 
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
@@ -120,6 +121,11 @@ public class UpstreamProducer {
             proxyBuilder.setRealm(
                     new Realm.Builder(source.getUpstreamAuthUser(), source.getUpstreamAuthPassword())
                             .setScheme(Realm.AuthScheme.BASIC));
+            if (source.getProtocol().contains("socks5")) {
+                proxyBuilder.setProxyType(ProxyType.SOCKS_V5);
+            } else if (source.getProtocol().contains("socks4")) {
+                proxyBuilder.setProxyType(ProxyType.SOCKS_V4);
+            }
         }
         getBuilder.setProxyServer(proxyBuilder);
 
