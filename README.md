@@ -2,6 +2,10 @@
 
 这是一个面向爬虫（抓取）业务的代理IP中间件，使用他可以让你采购的代理ip不会出现离线或者不可用的情况。
 
+# 商业版
+
+[Rogue](http://haproxy.virjar.com/rogue-doc/index.html)
+
 
 ## 核心功能
 
