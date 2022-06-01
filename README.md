@@ -3,4 +3,4 @@
 
 当然闭源软件将会对用户收取少许费用，然而我们承诺对于个人用户我们将永久提供测试授权。
 
-闭源产品地址： http://maleniatest.virjar.com/malenia-doc/index.html
+闭源产品地址： http://iinti.cn/malenia/
